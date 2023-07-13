@@ -19,6 +19,6 @@ class Recipe(object):
     def get_ingredients_quantities_metric_units(self):
         NotImplemented
 
-    def adjust_ingredients_quantities_based_on_goal(self):
+    def adjust_ingredients_quantities_based_on_goal(self, goal):
         NotImplemented
         # update the recipe's config dict...

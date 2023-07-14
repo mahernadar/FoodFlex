@@ -6,8 +6,9 @@ from rich import inspect
 # the following extract the numbers with the units;
 # most of the attributes have 2 values (value + % daily value);
 # Percent Daily Values are based on a 2,000 calorie diet!
+# the parsing includes 1,000 and 1000 parsing
 PARSING_ITEMS = {
-    "serving": r"(?<=Servings Per Recipe )(\d+(,\d+)*)",
+    "servings": r"(?<=Servings Per Recipe )(\d+(,\d+)*)",
     "calories": r"(?<=Calories )(\d+(,\d+)*)",
     "total_fat": r"(?<=Total Fat )(\d+(,\d+)*g )(\d+(,\d+)*%)",
     "saturated_fat": r"(?<=Saturated Fat )(\d+(,\d+)*g )(\d+(,\d+)*%)",
@@ -38,22 +39,20 @@ def nutrition_facts_parser(unstructured_nutrition_facts: str) -> dict:
         match = re.search(nutrient_regex, unstructured_nutrition_facts)
         if match:
             split_match = match.group().strip().split(" ")
-            print(nutrient, split_match)
+            # print(nutrient, split_match)
             if len(split_match) == 1:
-                # get nutrient value and unit, if present:
-                try:
-                    # separate value from unit:
-                    (value, _, value_unit) = re.match(
-                        r"((\d+(,\d+)*)([a-z]+)", split_match[0], re.I
-                    ).groups()
-                    structured_nutrition_dict[f"{nutrient}_{value_unit}"] = int(
+
+                single_split_match = split_match[0].split('g')
+                value = single_split_match[0]
+                if len(single_split_match) > 1:
+                
+                    structured_nutrition_dict[f"{nutrient}_g"] = int(
                         value.replace(',', '')
                     )
-                except:
-                    value = re.match(
-                        r"(\d+(,\d+)*)", split_match[0], re.I
-                    ).groups()[0]
-                    structured_nutrition_dict[nutrient] = int(value.replace(',', ''))
+                else:
+                    structured_nutrition_dict[nutrient] = int(
+                        value.replace(',', '')
+                    )
 
             # adding the value and percentage daily value (assuming 2k calories):
             elif len(split_match) == 2:

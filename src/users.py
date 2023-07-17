@@ -7,6 +7,7 @@ class User(object):
         age: int,
         weight: float,  # KG
         height: float,
+        gender: str,
         diet: str,
         restricted_ingredients: List[str] = [],
         daily_calories_goal: int = None,
@@ -43,6 +44,14 @@ class User(object):
 
     def adjust_recipes_quantities_based_on_calories(self):
         NotImplemented
+
+    def calculate_daily_calories_goal(self):
+    # source https://www.calculator.net/
+    # weight needs to be in KG and height in cm!
+        if self.gender == 'male':
+            self.daily_calories_goal = 13.397 * self.weight + 4.799 * self.height - 5.677 * self.age + 88.362
+        elif self.gender == 'female':
+            self.daily_calories_goal = 9.247* self.weight + 3.098 * self.height - 4.330 * self.age + 447.593
 
     def build_user_nutritional_values(self):
         protein_calories = self.weight * 4

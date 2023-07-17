@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 import numpy as np
 from rich import inspect
@@ -41,17 +42,15 @@ def nutrition_facts_parser(unstructured_nutrition_facts: str) -> dict:
             split_match = match.group().strip().split(" ")
             # print(nutrient, split_match)
             if len(split_match) == 1:
-
-                single_split_match = split_match[0].split('g')
+                single_split_match = split_match[0].split("g")
                 value = single_split_match[0]
                 if len(single_split_match) > 1:
-                
                     structured_nutrition_dict[f"{nutrient}_g"] = int(
-                        value.replace(',', '')
+                        value.replace(",", "")
                     )
                 else:
                     structured_nutrition_dict[nutrient] = int(
-                        value.replace(',', '')
+                        value.replace(",", "")
                     )
 
             # adding the value and percentage daily value (assuming 2k calories):
@@ -62,18 +61,24 @@ def nutrition_facts_parser(unstructured_nutrition_facts: str) -> dict:
                 ).groups()
                 # get percentage value
                 prct_daily_value = int(
-                    re.match(r"(\d+(,\d+)*)", split_match[1], re.I).groups()[0].replace(',', '')
+                    re.match(r"(\d+(,\d+)*)", split_match[1], re.I)
+                    .groups()[0]
+                    .replace(",", "")
                 )
 
                 # add the nutrient value with its unit to the dict:
                 structured_nutrition_dict[f"{nutrient}_{value_unit}"] = int(
-                    value.replace(',', '')
+                    value.replace(",", "")
                 )
                 structured_nutrition_dict[
                     f"{nutrient}_prct_daily"
                 ] = prct_daily_value
 
     return structured_nutrition_dict
+
+
+def sort_ingredients_alphabetically(ingredients: List):
+    return sorted(ingredients, key=str.lower)
 
 
 if __name__ == "__main__":

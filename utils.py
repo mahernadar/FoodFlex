@@ -1,8 +1,14 @@
 import re
 from typing import List
+import pickle
 
 import numpy as np
 from rich import inspect
+
+
+with open("recipe_title_embeddings_final.pkl", "rb") as fIn:
+    RECIPE_TITLE_EMBEDDINGS = pickle.load(fIn)
+
 
 # the following extract the numbers with the units;
 # most of the attributes have 2 values (value + % daily value);

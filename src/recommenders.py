@@ -2,16 +2,18 @@ import sys
 
 sys.path.insert(0, "../")  # needed for using the utils file in the notebook.
 
+from pprint import pprint
+from typing import List, Union
+
+import torch
+from sentence_transformers import util
+
 from utils import (
+    INGREDIENTS_INDICES,
     RECIPE_TITLE_EMBEDDINGS,
     RECIPES_METADATA,
-    INGREDIENTS_INDICES,
     RECOMMENDABLE_TITLE_EMBEDDINGS,
 )
-from sentence_transformers import util
-import torch
-from typing import Union, List
-from pprint import pprint
 
 ALL_INGREDIENTS_INDICES = INGREDIENTS_INDICES.ingredient_index.astype(
     str
@@ -42,15 +44,15 @@ class RecipeRecommender(object):
         getting the embeddings of all non-singular-ingredient recipes,
         normalizing and turning into matrix:
         """
+        recommend_dict = RECOMMENDABLE_TITLE_EMBEDDINGS.copy()
 
-        #TODO: remove the indices that were selected in the query:
-        corpus_embeddings = torch.stack(
-            list(RECOMMENDABLE_TITLE_EMBEDDINGS.values())
-        )
+        [recommend_dict.pop(key) for key in self.input_recipes_indices]
+
+        corpus_embeddings = torch.stack(list(recommend_dict.values()))
         corpus_embeddings_normalized = util.normalize_embeddings(
             corpus_embeddings
         )
-        
+
         corpus_embeddings_normalized = torch.squeeze(
             corpus_embeddings_normalized, dim=1
         )
@@ -78,17 +80,15 @@ class RecipeRecommender(object):
 
 
 if __name__ == "__main__":
-
     print("starting hummus recommendations... \n")
     # get recommended recipes based on one of the hummus recipes:
     hummus_index = [300, 21051]
 
-    cols = ['title', 'sorted_NER']
+    cols = ["title", "sorted_NER"]
 
-    print("recipe title: ", RECIPES_METADATA.iloc[hummus_index]['title'])
+    print("recipe title: ", RECIPES_METADATA.iloc[hummus_index]["title"])
 
-    print("ingredients: ", RECIPES_METADATA.iloc[hummus_index]['sorted_NER'])
-
+    print("ingredients: ", RECIPES_METADATA.iloc[hummus_index]["sorted_NER"])
 
     input_indices = [str(i) for i in hummus_index]
 
@@ -97,4 +97,3 @@ if __name__ == "__main__":
     recipe_recommender = RecipeRecommender(input_recipes_indices=input_indices)
     recipe_recommender.recommend(k=5)
     print(recipe_recommender.recommended_recipes)
-

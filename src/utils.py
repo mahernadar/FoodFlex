@@ -1,14 +1,21 @@
 import re
 from typing import List
 import pickle
+from pathlib import Path
 
 import numpy as np
-from rich import inspect
+import pandas as pd
 
 
-with open("recipe_title_embeddings_final.pkl", "rb") as fIn:
+with open("data/recipe_title_embeddings_final.pkl", "rb") as fIn:
     RECIPE_TITLE_EMBEDDINGS = pickle.load(fIn)
 
+with open("data/recommendable_recipes_embeddings.pkl", "rb") as fIn:
+    RECOMMENDABLE_TITLE_EMBEDDINGS = pickle.load(fIn)
+
+RECIPES_METADATA = pd.read_csv("data/recipes_with_nutrition_features.csv")
+
+INGREDIENTS_INDICES = pd.read_csv("data/ingredient_indices.csv")
 
 # the following extract the numbers with the units;
 # most of the attributes have 2 values (value + % daily value);
@@ -31,6 +38,9 @@ PARSING_ITEMS = {
     "potassium": r"(?<=Potassium )(\d+(,\d+)*mg )(\d+(,\d+)*%)",
 }
 
+def get_project_root() -> Path:
+    """Return the Path to the project root."""
+    return Path(__file__).absolute().parent.parent
 
 def nutrition_facts_parser(unstructured_nutrition_facts: str) -> dict:
     """_summary_
@@ -92,3 +102,6 @@ if __name__ == "__main__":
     text = "Nutrition Facts\nServings Per Recipe 16\nCalories 80\n% Daily Value *\nTotal Fat 4g 6%\nSaturated Fat 2g 11%\nCholesterol 148mg 49%\nSodium 114mg 5%\nTotal Carbohydrate 2g 1%\nDietary Fiber 0g 1%\nTotal Sugars 1g\nProtein 6g\nVitamin C 6mg 29%\nCalcium 12mg 1%\nIron 2mg 13%\nPotassium 76mg 2%\n* Percent Daily Values are based on a 2,000 calorie diet. Your daily values may be higher or lower depending on your calorie needs.\n** Nutrient information is not available for all ingredients. Amount is based on available nutrient data.\n(-) Information is not currently available for this nutrient. If you are following a medically restrictive diet, please consult your doctor or registered dietitian before preparing this recipe for personal consumption.\nPowered by the ESHA Research Database © 2018, ESHA Research, Inc. All Rights Reserved"
 
     print(nutrition_facts_parser(unstructured_nutrition_facts=text))
+
+    root = get_project_root()
+    print("root: ", root)
